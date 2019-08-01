@@ -1,0 +1,49 @@
+version: '2'
+services:
+  app:
+    build:
+      context: ./docker/app
+      args:
+       - USER_ID=$USER_ID
+      dockerfile: Dockerfile
+    image: soccer/app
+    environment:
+          - VIRTUAL_HOST=soccer
+    volumes:
+     - .:/var/www/html
+    ports:
+     - "80:80"
+    networks:
+     - dnet
+  mysql:
+     image: mysql:5.7
+     ports:
+      - "3306:3306"
+     environment:
+       MYSQL_ROOT_PASSWORD: "secret"
+       MYSQL_DATABASE: "soccer"
+       MYSQL_USER: "soccer"
+       MYSQL_PASSWORD: "secret"
+     volumes:
+       - /home/soccer/mysqldata:/var/lib/mysql
+       - ./docker/db/docker-entrypoint-initdb.d:/docker-entrypoint-initdb.d
+     networks:
+       - dnet
+  phpmyadmin:
+      image: phpmyadmin/phpmyadmin
+      container_name: soccer_phpmyadmin
+      environment:
+       PMA_ARBITRARY: 1
+      restart: always
+      ports:
+       - 8081:80
+      volumes:
+       - /sessions
+      networks:
+       - dnet
+networks:
+  dnet:
+    driver: "bridge"
+volumes:
+  mysqldata:
+    driver: "local"
