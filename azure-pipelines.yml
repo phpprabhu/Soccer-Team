@@ -22,5 +22,7 @@ steps:
     php -version
   displayName: 'Use PHP version $(phpVersion)'
 
+- script: composer selfupdate
+- script: composer update
 - script: composer install --no-interaction --prefer-dist --ignore-platform-reqs
   displayName: 'composer install'
